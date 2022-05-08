@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import {TypeOrmModule} from "@nestjs/typeorm"
 import { ConfigModule } from '@nestjs/config';
+import { Userv2Module } from './userv2/userv2.module';
+import { Itemv2Module } from './itemv2/itemv2.module';
 import allConfig from './config/allConfig';
 import * as Joi from 'joi';
 @Module({
@@ -43,8 +45,11 @@ import * as Joi from 'joi';
         database: process.env.NFT_DB_DATABASE,
         entities: [__dirname + '/**/*.entity.{js,ts}'],
         synchronize: (process.env.NFT_DB_SYNCHRONIZE === "true") ? true:false, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
+        logging:true
       }
     ),
+    Userv2Module,
+    Itemv2Module,
     
   ],
   controllers: [AppController],
