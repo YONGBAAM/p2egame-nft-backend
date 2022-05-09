@@ -9,6 +9,8 @@ import {
 
 @Entity()
 export class ItemV2 {
+
+  // This primary column is meaningless
   @PrimaryGeneratedColumn('uuid')
   uiid: string;
 

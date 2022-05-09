@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { CreateItemv2Dto } from './dto/create-itemv2.dto';
-import { UpdateItemv2Dto } from './dto/update-itemv2.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ItemV2 } from './entities/itemv2.entity';
+import { Repository } from "typeorm"
+import { LocalUser } from 'src/userv2/entities/local-user.entity';
+import { ItemsDto, OneItemDto } from './dto/item.dto';
 
 @Injectable()
 export class Itemv2Service {
-  create(createItemv2Dto: CreateItemv2Dto) {
-    return 'This action adds a new itemv2';
+  constructor(
+    @InjectRepository(ItemV2)
+    private readonly itemRepository: Repository<ItemV2>
+  ) {};
+
+  async addOneItem(user:LocalUser, item:OneItemDto):Promise<void> {
+
   }
 
-  findAll() {
-    return `This action returns all itemv2`;
+  async deleteOneItem(user:LocalUser, item:OneItemDto):Promise<void> {
+    // throw new ItemNotFoundException
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} itemv2`;
+  async addItems(user:LocalUser, items:ItemsDto): Promise<ItemsDto> {
+    return undefined;
   }
 
-  update(id: number, updateItemv2Dto: UpdateItemv2Dto) {
-    return `This action updates a #${id} itemv2`;
+  async deleteItems(user:LocalUser, items:ItemsDto): Promise<ItemsDto> {
+    return undefined;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} itemv2`;
+  async getItems(user:LocalUser): Promise<ItemsDto> {
+    return undefined;
   }
+
+  async getItemCount(user:LocalUser, nftId:string):Promise<number> {
+    return undefined
+  }
+
 }
