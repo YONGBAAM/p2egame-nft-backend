@@ -1,10 +1,21 @@
 
 export class OneItemDto {
-  nftId:string;
-  count:string;
+  constructor(nftId: string, count: number) {
+    this.nftId = nftId;
+    this.count = count;
+  }
+  nftId: string;
+  count: number;
 }
 
-export class ItemsDto {
+export class ContractDto {
   contract:string;
-  items:OneItemDto[];
+}
+
+export class ItemsDto extends ContractDto {
+  items: OneItemDto[] = [];
+}
+
+export class queryOneItemDto extends ContractDto {
+  nftId:string;
 }

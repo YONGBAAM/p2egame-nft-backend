@@ -7,11 +7,12 @@ import { LocalUser } from './entities/local-user.entity';
 import { GlobalUser } from './entities/global-user.entity';
 
 @Module({
-  imports: [Itemv2Module,
+  imports: [
     TypeOrmModule.forFeature([LocalUser]),
     TypeOrmModule.forFeature([GlobalUser]),
   ],
   controllers: [Userv2Controller],
-  providers: [Userv2Service,Userv2Controller]
+  providers: [Userv2Service],
+  exports: [Userv2Service]
 })
-export class Userv2Module {}
+export class Userv2Module { }

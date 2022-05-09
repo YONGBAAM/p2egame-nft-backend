@@ -1,34 +1,50 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ContextType } from '@nestjs/common';
+import { Userv2Service } from 'src/userv2/userv2.service';
+import { ContractDto, ItemsDto, queryOneItemDto } from './dto/item.dto';
 import { Itemv2Service } from './itemv2.service';
-import { CreateItemv2Dto } from './dto/create-itemv2.dto';
-import { UpdateItemv2Dto } from './dto/update-itemv2.dto';
 
-@Controller('itemv2')
+@Controller('v2/items')
 export class Itemv2Controller {
-  constructor(private readonly itemv2Service: Itemv2Service) {}
+  constructor(
+    private readonly itemsService: Itemv2Service,
+    private readonly usersService: Userv2Service,
+  ) { }
 
-  @Post()
-  create(@Body() createItemv2Dto: CreateItemv2Dto) {
-    return this.itemv2Service.create(createItemv2Dto);
+  @Post("/add/:wallet")
+  async addItems(
+    @Param("wallet") walletAddress: string,
+    @Body() dto: ItemsDto
+  ): Promise<ItemsDto> {
+    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    return await this.itemsService.addItems(lu, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.itemv2Service.findAll();
+  @Post("/delete/:wallet")
+  async deleteItems(
+    @Param("wallet") walletAddress: string,
+    @Body() dto: ItemsDto
+  ): Promise<ItemsDto> {
+    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    return await this.itemsService.deleteItems(lu, dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemv2Service.findOne(+id);
+  @Post("/get/:wallet")
+  async getItems(
+    @Param("wallet") walletAddress: string,
+    @Body() dto: ContractDto
+  ): Promise<ItemsDto> {
+    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    return await this.itemsService.getItems(lu)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemv2Dto: UpdateItemv2Dto) {
-    return this.itemv2Service.update(+id, updateItemv2Dto);
+  // Is differentiate with only body is acceptable?
+  @Post("/get/:wallet")
+  async getItemCount(
+    @Param("wallet") walletAddress: string,
+    @Body() dto: queryOneItemDto
+  ): Promise<number> {
+    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    return await this.itemsService.getItemCount(lu, dto.nftId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemv2Service.remove(+id);
-  }
 }
