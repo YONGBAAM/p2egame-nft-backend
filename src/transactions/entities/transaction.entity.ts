@@ -1,27 +1,38 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {SolidityEvent} from "../dto/event"
 
-@Entity("Transaction")
-export class Transaction {
+/*
+This is event-based transaciton object
+One transaction can have several types of events, such as approval and transfer in ERC721 transfer. 
+*/
+@Entity("Transactions")
+export class TransactionRecord {
+    // @PrimaryColumn()
+    // eventTransactionHash: string; // Transfer_0x....
+
     @PrimaryColumn()
-    transactionId: string;
+    transactionHash:string;
 
-    @Column()
-    walletAddress: string;
-
-    @Column()
-    transactionType: string; // Enum? "deposit", "withdrawal"
+    @PrimaryColumn()
+    eventType:string; // Enum? "deposit", "withdrawal"
 
     @Column("jsonb", { nullable: true })
-    actionInfo: object; // callback function infos. ""
+    event: SolidityEvent; // Consumed event
 
-    @Column() // what is default type of enums?
-    status: string; // 'submitted', 'completed', "invalid",
+    @Column({ nullable: true })
+    registeredFrom: string; // api call account
 
-    @Column('int', { default: -1 })
-    blockCount: number = -1; // default value?
+    @Column({ nullable: true })
+    actionType:string; // Enum? "deposit", "withdrawal"
+
+    @Column("int", { nullable: true })
+    submitBlock:number;
+
+    @Column()
+    status:string;// 'submitted',"event", 'completed', "invalid", "error" // 블록카운트 비교해서
 
     @Column("jsonb", { nullable: true })
-    others: object;
+    others: SolidityEvent; // Consumed event
 }
 
 // TODO: Apply this

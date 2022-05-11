@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nest
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { OnChainService } from './on-chain.service';
+import { RegisterTransactionDto } from './dto/register-transaction.dto';
 
 
 @Controller('chain')
@@ -11,11 +12,11 @@ export class TransactionsController {
     private readonly onChainService: OnChainService
   ) { }
 
-  @Post()
-  async create(@Body() dto: CreateTransactionDto) {
+  // @Post()
+  // async create(@Body() dto: CreateTransactionDto) {
 
-    return this.transactionsService.create(dto.walletAddress, dto.transactionType == 'to_nft', dto.transactionId)
-  }
+  //   return this.transactionsService.create(dto.walletAddress, dto.transactionType == 'to_nft', dto.transactionId)
+  // }
 
   @Get("transactions/:txid")
   async queryTransaction(@Param('txid') txid: string) {
@@ -38,8 +39,20 @@ export class TransactionsController {
     return this.onChainService.queryNftMetaData(nftId);
   }
 
+  @Get("event")
+  async queryEvent() {
+    return this.onChainService.queryEvent("Transfer", 0, undefined)
+  }
 
+  @Post("register")
+  async registerTransaction(@Body() dto:RegisterTransactionDto) {
+    this.transactionsService.registerTransaction(dto)
+  }
 
+  @Get("regular")
+  async triggerRegular() {
+    return this.transactionsService.regularTask();
+  }
   // find all pending
 
 

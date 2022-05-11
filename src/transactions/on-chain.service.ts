@@ -9,13 +9,15 @@ import { ItemMetadata } from 'src/users/dto/item-metadata';
 import { ConfigType } from '@nestjs/config';
 import allConfig from 'src/config/allConfig';
 import { TransactionReceipt } from 'caver-js';
-import { time } from 'console';
+import { Console, time } from 'console';
 import { UsersService } from 'src/users/users.service';
 import { GameService } from 'src/users/game.service';
+import { SolidityEvent } from './dto/event';
 // import Web3 from 'web3';
 
 /*
 Unlike transaction service, This is adapter to block chain
+This is utility class so will not have any status variable
 */
 
 export class OnChainService {
@@ -43,7 +45,9 @@ export class OnChainService {
     : Promise<OnChainTransactionStatus> {
     try {
       Logger.log("value:" + transactionHash)
-      const result = await this.caver.klay.getTransactionReceipt(transactionHash);
+      const result = await this.caver.transaction.getTransactionByHash(transactionHash);
+console.log(result)
+
       const status = new OnChainTransactionStatus();
       if (!result) {
         status.isGood = false;
@@ -157,10 +161,27 @@ export class OnChainService {
     throw new NotImplementedException();
   }
 
-  
+  async queryEvent(eventType: string, fromBlock:number, toBlock:number) {
+  const res1:object[] = 
+  await this.contract.getPastEvents(eventType, 
+  {fromBlock:fromBlock, toBlock: toBlock, filter: {from:process.env.CHAIN_OWNER_ACCOUNT}})
+  const res2:object[] = await this.contract.getPastEvents(eventType, 
+    {fromBlock:fromBlock, toBlock: toBlock, filter: {to:process.env.CHAIN_OWNER_ACCOUNT}})
+  // console.log(res1);
+  // console.log(res2);
+  // Logger.log(res)
+  const rr:SolidityEvent[] = []
+  res1 && res1.map(i =>rr.push( Object.assign(new SolidityEvent(), i)));
+  res2 && res2.map(i =>rr.push( Object.assign(new SolidityEvent(), i)));
+  // for (const r of rr) {
+  //   Logger.log(r.blockHash)
+  // }
+  return rr;
+  }
 
   async queryNftOwner(nftId: number) {
     throw new NotImplementedException();
   }
   // send gold to wallet
+
 }
