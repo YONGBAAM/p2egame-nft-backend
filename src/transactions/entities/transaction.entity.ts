@@ -3,19 +3,25 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity("Transaction")
 export class Transaction {
     @PrimaryColumn()
-    transactionId:string;
+    transactionId: string;
 
     @Column()
-    walletAddress:string;
+    walletAddress: string;
 
     @Column()
-    transactionType:string; // Enum?
+    transactionType: string; // Enum? "deposit", "withdrawal"
+
+    @Column("jsonb", { nullable: true })
+    actionInfo: object; // callback function infos. ""
 
     @Column() // what is default type of enums?
-    status:string; // 'submitted', 'completed'
+    status: string; // 'submitted', 'completed', "invalid",
 
-    @Column('int', {default:-1})
-    blockCount:number; // default value?
+    @Column('int', { default: -1 })
+    blockCount: number = -1; // default value?
+
+    @Column("jsonb", { nullable: true })
+    others: object;
 }
 
 // TODO: Apply this

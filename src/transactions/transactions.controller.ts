@@ -4,7 +4,7 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { OnChainService } from './on-chain.service';
 
 
-@Controller('transactions')
+@Controller('chain')
 export class TransactionsController {
   constructor(
     private readonly transactionsService: TransactionsService,
@@ -17,18 +17,18 @@ export class TransactionsController {
     return this.transactionsService.create(dto.walletAddress, dto.transactionType == 'to_nft', dto.transactionId)
   }
 
-  @Get("on-chain/transactions/:txid")
+  @Get("transactions/:txid")
   async queryTransaction(@Param('txid') txid: string) {
     Logger.log(txid)
     return this.onChainService.queryTransaction(txid);
   }
 
-  @Get("on-chain/block")
+  @Get("block")
   async getBlockNumber() {
     return this.onChainService.getBlockNumber();
   }
 
-  @Get("on-chain/nft/:nftId")
+  @Get("nft/:nftId")
   async findOwnerOfNft(@Param("nftId") nftId: number) {
     return this.onChainService.findOwnerByNftId(nftId);
   }

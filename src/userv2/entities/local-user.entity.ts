@@ -14,6 +14,7 @@ export class LocalUser {
   @JoinColumn([
     {name: "contract", referencedColumnName:"contract"},
   ])
+  
   items:ItemV2[];
 
   @CreateDateColumn()

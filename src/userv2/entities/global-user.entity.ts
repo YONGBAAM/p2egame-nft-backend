@@ -11,6 +11,5 @@ export class GlobalUser {
 
   @Column("jsonb", {nullable:true})
   others:object;
-  
 
 }
