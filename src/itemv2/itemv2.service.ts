@@ -4,15 +4,12 @@ import { ItemV2 } from './entities/itemv2.entity';
 import { Repository } from "typeorm"
 import { LocalUser } from 'src/userv2/entities/local-user.entity';
 import { ItemsDto, OneItemDto } from './dto/item.dto';
-import { Userv2Service } from 'src/userv2/userv2.service';
-import { Item } from 'src/users/dto/item';
 
 @Injectable()
 export class Itemv2Service {
   constructor(
     @InjectRepository(ItemV2)
-    private readonly itemsRepository: Repository<ItemV2>,
-    private readonly userService: Userv2Service,
+    private readonly itemsRepository: Repository<ItemV2>
   ) { };
 
   async addOneItem(user: LocalUser, item: OneItemDto): Promise<ItemsDto> {
@@ -37,7 +34,8 @@ export class Itemv2Service {
     returnItems.contract = dto.contract
     for (const item of dto.items) {
       // TODO: Use Custom Repository and use findOrCreate()
-      var itemEntity = await this.itemsRepository.findOne({ user: user, contract: dto.contract, nftId: item.nftId })
+      var itemEntity = await this.itemsRepository
+      .findOne({ user: user, contract: dto.contract, nftId: item.nftId })
       if (itemEntity === undefined) {
         itemEntity = new ItemV2();
         itemEntity.contract = dto.contract;
@@ -48,7 +46,8 @@ export class Itemv2Service {
       itemEntity.count += item.count;
       Logger.log(itemEntity)
       await this.itemsRepository.save(itemEntity);
-      returnItems.items.push(new OneItemDto(itemEntity.nftId, itemEntity.count));
+      returnItems.items
+      .push(new OneItemDto(itemEntity.nftId, itemEntity.count));
     }
     return returnItems;
   }
@@ -68,9 +67,12 @@ export class Itemv2Service {
 
     // Cache new item entities and save them after checking user have all items.
     const newItemEntities: ItemV2[] = [];
-    for (const nftId of itemsToDeletes.keys()) {
-      const deleteCount = itemsToDeletes.get(nftId);
-      const itemEntity = await this.itemsRepository.findOne({ contract: dto.contract, user: user, nftId: nftId })
+    const entryArray = Array.from(itemsToDeletes);
+    entryArray.sort((a, b) => a[0].localeCompare(b[0])); // Sort for unit test orders
+  // 출처: https://nukw0n-dev.tistory.com/13 [찐이의 개발 연결구과]
+    for (const [nftId,deleteCount] of entryArray) {
+      const itemEntity = await this.itemsRepository
+      .findOne({ contract: dto.contract, user: user, nftId: nftId })
       if (itemEntity === undefined || itemEntity.count < deleteCount) {
         throw new Error(`User do not have item k:${nftId} v:${deleteCount}`)
       }
@@ -81,7 +83,7 @@ export class Itemv2Service {
     const returnItemsDto = new ItemsDto();
     returnItemsDto.contract = dto.contract;
     for (const newItem of newItemEntities) {
-      this.itemsRepository.save(newItem);
+      await this.itemsRepository.save(newItem);
       returnItemsDto.items.push(new OneItemDto(newItem.nftId, newItem.count))
     }
 
@@ -97,7 +99,8 @@ export class Itemv2Service {
   }
 
   async getItemCount(user: LocalUser, nftId: string): Promise<number> {
-    const item = await this.itemsRepository.findOne({user:user, contract:user.contract, nftId:nftId})
+    const item = await this.itemsRepository
+    .findOne({user:user, contract:user.contract, nftId:nftId})
     if (item !== undefined) return item.count;
     return 0;
   }
