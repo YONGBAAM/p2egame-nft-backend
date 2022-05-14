@@ -1,17 +1,12 @@
 import { web3Wrapper } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
-// import { TransactionReceipt } from 'web3-eth'
 import { Inject, Logger, NotImplementedException } from '@nestjs/common';
 import { toBN } from 'web3-utils';
-import path from 'path';
 import * as fs from "fs"
 import { ItemMetadata } from 'src/users/dto/item-metadata';
 import { ConfigType } from '@nestjs/config';
 import allConfig from 'src/config/allConfig';
 import { TransactionReceipt } from 'caver-js';
-import { Console, time } from 'console';
-import { UsersService } from 'src/users/users.service';
-import { GameService } from 'src/users/game.service';
 import { SolidityEvent } from './dto/event';
 // import Web3 from 'web3';
 

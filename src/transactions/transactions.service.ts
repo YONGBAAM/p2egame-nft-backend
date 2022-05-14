@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { TransactionRecord } from './entities/transaction.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm"
@@ -6,19 +6,32 @@ import { RegisterTransactionDto } from './dto/register-transaction.dto';
 import { SolidityEvent, TransferReturnValue } from './dto/event';
 import { OnChainService } from './on-chain.service';
 import { TransactionUtils } from './TransactionUtils';
+import { Itemv2Service } from 'src/itemv2/itemv2.service';
+import { UsersService } from 'src/users/users.service';
+import { Userv2Service } from 'src/userv2/userv2.service';
+import allConfig from 'src/config/allConfig';
+import { ConfigType } from '@nestjs/config';
+import { OneItemDto } from 'src/itemv2/dto/item.dto';
+
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(TransactionRecord)
     private readonly transactionRepository: Repository<TransactionRecord>,
+    @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
     private readonly onChainService: OnChainService,
+    private readonly itemsService:Itemv2Service,
+    private readonly usersService:Userv2Service
   ) {
-
+    // Currently support only one contract(of NFT) since we need other ABIs
+    // TODO: Use ERC721 ABI and support multi contract
+    this.contract = config.contractAddress;
   };
   private initialized = false;
   private LastBlockChecked: number;
   private currentBlockNumber: number = 0;
   private finishBlockCount: number = 50;
+  private contract:string;
 
   // We could not use async in constructor;
   async init() {
@@ -109,19 +122,34 @@ export class TransactionsService {
       switch (actionType) {
         case "deposit":
           var ret: TransferReturnValue = tx.event.returnValues as TransferReturnValue;
+          if (ret.from === ret.to) {
+            throw new Error("from and to is same " + JSON.stringify(ret))
+          }
           Logger.log("deposit" + JSON.stringify(ret))
+          const addUser = await this.usersService.getLocalUser(ret.from, this.contract);
+          
+          // TODO: Why number id?
+          this.itemsService.addOneItem(addUser, new OneItemDto(""+ret.tokenId, 1))
+          Logger.log("added " + JSON.stringify(addUser) + " id: " + ret.tokenId);
           break;
 
         case "withdrawal":
+          if (ret.from === ret.to) {
+            throw new Error("from and to is same " + JSON.stringify(ret))
+          }
           var ret: TransferReturnValue = tx.event.returnValues as TransferReturnValue;
           Logger.log("withdrawal" + JSON.stringify(ret))
+
+          const delUser = await this.usersService.getLocalUser(ret.to, this.contract);
+          this.itemsService.deleteOneItem(delUser, new OneItemDto(""+ret.tokenId, 1))
+          Logger.log("deleted " + JSON.stringify(delUser) + " id: " + ret.tokenId);
+
           break;
 
         default:
           throw new Error("Invalid Action Type: " + actionType + " txid: " + tx.transactionHash);
       }
       this.markCompleted(tx);
-
 
     } catch (error) {
       Logger.error("Error processing Callback: " + tx.transactionHash + " err: " + error);
@@ -163,14 +191,11 @@ export class TransactionsService {
       // TODO: Refactor this.. 
       if (tx.event) {
         Logger.log("event is already registered: " + tx.transactionHash)
-        console.log("event is already registered: " + tx.transactionHash)
         return tx;
       }
       tx = TransactionUtils.addEvent(tx, event);
     } else {
-
       tx = TransactionUtils.fromEvent(event);
-
       Logger.warn("Event Consumed Before Register txid: " + tx.transactionHash);
     }
     await this.transactionRepository.save(tx)

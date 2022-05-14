@@ -7,10 +7,13 @@ import { OnChainService } from './on-chain.service';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { Itemv2Module } from 'src/itemv2/itemv2.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([TransactionRecord]),
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    Itemv2Module,
+    UsersModule
 
   ],
   controllers: [TransactionsController],

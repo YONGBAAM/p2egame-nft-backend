@@ -9,6 +9,10 @@ import { SolidityEvent } from "./dto/event";
 import { TransferReturnValue } from "src/transactions/dto/event"
 import { create } from "domain";
 import { TransactionUtils } from "./TransactionUtils";
+import { ConfigType, getConfigToken } from "@nestjs/config";
+import allConfig from "src/config/allConfig";
+import { Itemv2Service } from "src/itemv2/itemv2.service";
+import { Userv2Service } from "src/userv2/userv2.service";
 
 const CHANGGO_ADDRESS = "0xcccc";
 
@@ -28,11 +32,13 @@ describe('TransactionsService', () => {
   let service: TransactionsService;
   let onChainService: OnChainService;
   let transactionsRepository: Repository<TransactionRecord>;
+  let config: ConfigType<typeof allConfig>
 
   const transactionHash = "0x1212";
   const eventType = "Transfer";
   const account1 = "0xaaaa";
   const account2 = "0xabbb";
+  const contract = "0xcccc"
 
 
   beforeEach(async () => {
@@ -49,13 +55,34 @@ describe('TransactionsService', () => {
             getBlockNumber: jest.fn(),
             queryEvent: jest.fn(),
           },
-        }
+        },
+        {
+          provide: allConfig.KEY,
+          useValue: {
+            contract: contract
+          },
+        },
+        {
+          provide: Itemv2Service,
+          useValue: {
+            addOneItem: jest.fn(),
+            deleteOneItem: jest.fn()
+          }
+        },
+        {
+          provide: Userv2Service,
+          useValue: {
+            getLocalUser: jest.fn(),
+          }
+        },
+
       ],
     }).compile();
 
     service = module.get<TransactionsService>(TransactionsService);
     transactionsRepository = module.get(getRepositoryToken(TransactionRecord));
     onChainService = module.get<OnChainService>(OnChainService);
+    config = module.get<ConfigType<typeof allConfig>>(allConfig.KEY);
 
   });
 
@@ -182,7 +209,7 @@ describe('TransactionsService', () => {
 
   });
 
-  
+
 
 });
 
