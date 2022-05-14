@@ -74,7 +74,9 @@ export class TransactionsService {
     Logger.debug(`Consuming from ${this.LastBlockChecked+1} to ${queryBlockEnd}`)
     const events = await this.onChainService
       .queryEvent("Transfer", this.LastBlockChecked+1, queryBlockEnd)
-    events && events.forEach(e => this.registerEvent(e))
+    for (const e of events) {
+      await this.registerEvent(e)
+    }
     this.LastBlockChecked = queryBlockEnd;
     Logger.debug("Consumed: " + events.length);
   }
@@ -137,8 +139,8 @@ export class TransactionsService {
     var tx = await this.transactionRepository.findOne({
       transactionHash: dto.transactionHash, eventType: dto.eventType
     })
-    if (tx !== undefined) {
-      if (tx.eventType !== null || tx.registeredFrom !== null) {
+    if (tx) {
+      if (tx.eventType || tx.registeredFrom) {
         Logger.log("Transaction Already Registered: " + tx.transactionHash)
         return tx;
       }
@@ -146,7 +148,7 @@ export class TransactionsService {
     } else {
       tx = TransactionUtils.fromDto(dto);
     }
-    this.transactionRepository.save(tx)
+    await this.transactionRepository.save(tx)
     return tx;
   }
   // register event
@@ -157,19 +159,21 @@ export class TransactionsService {
       transactionHash: event.transactionHash, eventType: event.event
     })
     Logger.debug(JSON.stringify(tx))
-    if (tx !== undefined) {
+    if (tx) {
       // TODO: Refactor this.. 
-      if (tx.event !== null) {
+      if (tx.event) {
         Logger.log("event is already registered: " + tx.transactionHash)
+        console.log("event is already registered: " + tx.transactionHash)
         return tx;
       }
       tx = TransactionUtils.addEvent(tx, event);
     } else {
+
       tx = TransactionUtils.fromEvent(event);
 
       Logger.warn("Event Consumed Before Register txid: " + tx.transactionHash);
     }
-    this.transactionRepository.save(tx)
+    await this.transactionRepository.save(tx)
     return tx;
   }
 
