@@ -3,7 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { LocalUser } from 'src/userv2/entities/local-user.entity';
 import { ItemV2 } from 'src/itemv2/entities/itemv2.entity';
 import { Itemv2Service } from './itemv2.service';
-import { } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { ItemsDto, OneItemDto } from './dto/item.dto';
 import * as uuid from 'uuid';
@@ -58,12 +57,14 @@ describe('Itemv2Service', () => {
 
     it('add undefined ', async () => {
 
+      // TODO: Deduplicate codes for these items and SPYs. 
+      // Since item.value is changed, this need to be duplicated for now.
       const item1 = generateItem(contract1, "1", 1, localUser);
       const item2 = generateItem(contract1, "2", 2, localUser);
       const item3 = generateItem(contract1, "3", 3, localUser);
+
       const findSpy = jest.spyOn(itemsRepository, "findOne")
         .mockResolvedValue(undefined);
-
       const saveSpy = jest.spyOn(itemsRepository, "save")
         .mockResolvedValue(undefined);
 
@@ -71,12 +72,6 @@ describe('Itemv2Service', () => {
       dto.contract = contract1;
       dto.items = [new OneItemDto("1", 1), new OneItemDto("2", 2)]
       await service.addItems(localUser, dto)
-
-      // const itemres1 = Object.assign(new ItemV2(), item1)
-      // itemres1.count = 3;
-
-      // const itemres2 = Object.assign(new ItemV2(), item1)
-      // itemres2.count = 6;
 
       expect(findSpy).toBeCalledTimes(2);
       expect(saveSpy).toBeCalledTimes(2);

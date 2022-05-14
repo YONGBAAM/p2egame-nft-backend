@@ -35,8 +35,6 @@ export class OnChainService {
   caver; // TODO: 이거 클래스내부 배리어블 어떻게 하지?
   contract; // web3 contract
 
-
-
   private async sendTransaction() {
 
   }
