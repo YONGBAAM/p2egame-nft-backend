@@ -12,8 +12,5 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-  // @Get("/email")
-  // gw(): string {
-  //   return this.config.baseUrl;
-  // }
+
 }

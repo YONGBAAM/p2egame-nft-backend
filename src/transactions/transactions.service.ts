@@ -7,7 +7,6 @@ import { SolidityEvent, TransferReturnValue } from './dto/event';
 import { OnChainService } from './on-chain.service';
 import { TransactionUtils } from './TransactionUtils';
 import { Itemv2Service } from 'src/itemv2/itemv2.service';
-import { UsersService } from 'src/users/users.service';
 import { Userv2Service } from 'src/userv2/userv2.service';
 import allConfig from 'src/config/allConfig';
 import { ConfigType } from '@nestjs/config';

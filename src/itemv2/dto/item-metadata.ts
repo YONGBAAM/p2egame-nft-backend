@@ -1,5 +1,5 @@
-import { Item } from "./item";
 
+// Deprecated
 export class ItemMetadata {
   name: string;
   description: string;
