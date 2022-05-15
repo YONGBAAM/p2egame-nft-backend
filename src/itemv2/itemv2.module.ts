@@ -12,7 +12,7 @@ import { Userv2Module } from 'src/userv2/userv2.module';
   ],
   controllers: [Itemv2Controller],
   providers: [Itemv2Service],
-  exports: [
+  exports: [Itemv2Service
   ]
 })
 export class Itemv2Module { }

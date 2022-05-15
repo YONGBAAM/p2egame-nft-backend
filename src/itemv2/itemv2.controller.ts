@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ContextType } from '@nestjs/common';
 import { Userv2Service } from 'src/userv2/userv2.service';
-import { ContractDto, ItemsDto, queryOneItemDto } from './dto/item.dto';
+import { userDto, ItemsDto, queryOneItemDto } from './dto/item.dto';
 import { Itemv2Service } from './itemv2.service';
 
 @Controller('v2/items')
@@ -10,40 +10,40 @@ export class Itemv2Controller {
     private readonly usersService: Userv2Service,
   ) { }
 
-  @Post("/add/:wallet")
+  @Post("/add")
   async addItems(
-    @Param("wallet") walletAddress: string,
     @Body() dto: ItemsDto
   ): Promise<ItemsDto> {
-    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
     return await this.itemsService.addItems(lu, dto);
   }
 
-  @Post("/delete/:wallet")
+  @Post("/delete")
   async deleteItems(
-    @Param("wallet") walletAddress: string,
     @Body() dto: ItemsDto
   ): Promise<ItemsDto> {
-    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
     return await this.itemsService.deleteItems(lu, dto);
   }
-
-  @Post("/get/:wallet")
+ 
+  // TODO: Response code 200
+  @Post("/get")
   async getItems(
-    @Param("wallet") walletAddress: string,
-    @Body() dto: ContractDto
+    @Body() dto: userDto
   ): Promise<ItemsDto> {
-    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
-    return await this.itemsService.getItems(lu)
+    console.log(dto)
+    const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
+    const ret = await this.itemsService.getItems(lu);
+    ret.items = ret.items.filter(i => i.count>0)
+    return ret
   }
 
   // Is differentiate with only body is acceptable?
-  @Post("/get/:wallet")
+  @Post("/get")
   async getItemCount(
-    @Param("wallet") walletAddress: string,
     @Body() dto: queryOneItemDto
   ): Promise<number> {
-    const lu = await this.usersService.getLocalUser(walletAddress, dto.contract);
+    const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
     return await this.itemsService.getItemCount(lu, dto.nftId);
   }
 

@@ -92,6 +92,7 @@ export class Itemv2Service {
 
   async getItems(user: LocalUser): Promise<ItemsDto> {
     const items = await this.itemsRepository.find({user:user, contract:user.contract})
+    console.log(items)
     const returnItemsDto = new ItemsDto();
     returnItemsDto.contract = user.contract;
     items && items.forEach(it => returnItemsDto.items.push(new OneItemDto(it.nftId, it.count)));

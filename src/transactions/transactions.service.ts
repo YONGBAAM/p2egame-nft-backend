@@ -12,6 +12,8 @@ import { Userv2Service } from 'src/userv2/userv2.service';
 import allConfig from 'src/config/allConfig';
 import { ConfigType } from '@nestjs/config';
 import { OneItemDto } from 'src/itemv2/dto/item.dto';
+import { Interval } from '@nestjs/schedule';
+import { WithdrawItemDto } from './dto/withdraw-item.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -30,7 +32,7 @@ export class TransactionsService {
   private initialized = false;
   private LastBlockChecked: number;
   private currentBlockNumber: number = 0;
-  private finishBlockCount: number = 50;
+  private finishBlockCount: number = 10;
   private contract:string;
 
   // We could not use async in constructor;
@@ -55,7 +57,7 @@ export class TransactionsService {
   }
 
 
-  // @Interval('intervalTask', 10000)
+  @Interval('intervalTask', 10000)
   async regularTask() {
     Logger.log("Starting task")
 
@@ -134,10 +136,10 @@ export class TransactionsService {
           break;
 
         case "withdrawal":
+          var ret: TransferReturnValue = tx.event.returnValues as TransferReturnValue;
           if (ret.from === ret.to) {
             throw new Error("from and to is same " + JSON.stringify(ret))
           }
-          var ret: TransferReturnValue = tx.event.returnValues as TransferReturnValue;
           Logger.log("withdrawal" + JSON.stringify(ret))
 
           const delUser = await this.usersService.getLocalUser(ret.to, this.contract);
@@ -168,7 +170,8 @@ export class TransactionsService {
       transactionHash: dto.transactionHash, eventType: dto.eventType
     })
     if (tx) {
-      if (tx.eventType || tx.registeredFrom) {
+      if (tx.registeredFrom) {
+        Logger.log(JSON.stringify(tx))
         Logger.log("Transaction Already Registered: " + tx.transactionHash)
         return tx;
       }
@@ -200,6 +203,25 @@ export class TransactionsService {
     }
     await this.transactionRepository.save(tx)
     return tx;
+  }
+
+  async safeWithdrawNft(dto:WithdrawItemDto) {
+    const lu = await this.usersService.getLocalUser(dto.walletAddress, this.contract);
+    const itemCount = await this.itemsService.getItemCount(lu, dto.nftId);
+    if (itemCount <1) {
+      throw new Error("User does not have item id: " + dto.nftId)
+    }
+    const submitTx = await this.onChainService
+    .rawSendNft(dto.walletAddress, +dto.nftId);
+    
+    if (submitTx && submitTx.transactionHash) {
+      const registerDto = new RegisterTransactionDto(
+      submitTx.transactionHash, "Transfer", dto.walletAddress, "withdrawal",
+      );
+
+      this.registerTransaction(registerDto);
+    }
+
   }
 
 }

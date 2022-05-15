@@ -8,14 +8,15 @@ export class OneItemDto {
   count: number;
 }
 
-export class ContractDto {
+export class userDto {
+  walletAddress:string;
   contract:string;
 }
 
-export class ItemsDto extends ContractDto {
+export class ItemsDto extends userDto {
   items: OneItemDto[] = [];
 }
 
-export class queryOneItemDto extends ContractDto {
+export class queryOneItemDto extends userDto {
   nftId:string;
 }
