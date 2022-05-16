@@ -24,7 +24,6 @@ export class LocalUser {
   updatedDate: Date;
 
   @ManyToOne( () => GlobalUser, user => user.localUsers)
-  @JoinColumn({name:'walletAddress'})
   globalUser:GlobalUser;
   
 }

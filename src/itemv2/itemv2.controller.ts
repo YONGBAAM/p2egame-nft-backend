@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ContextType } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ContextType, Logger } from '@nestjs/common';
 import { Userv2Service } from 'src/userv2/userv2.service';
 import { userDto, ItemsDto, queryOneItemDto } from './dto/item.dto';
 import { Itemv2Service } from './itemv2.service';
@@ -31,7 +31,7 @@ export class Itemv2Controller {
   async getItems(
     @Body() dto: userDto
   ): Promise<ItemsDto> {
-    console.log(dto)
+    Logger.debug("get items " + JSON.stringify(dto))
     const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
     const ret = await this.itemsService.getItems(lu);
     ret.items = ret.items.filter(i => i.count>0)

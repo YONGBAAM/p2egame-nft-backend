@@ -58,7 +58,7 @@ export class TransactionsService {
 
   @Interval('intervalTask', 10000)
   async regularTask() {
-    Logger.log("Starting task")
+    Logger.debug("Starting task")
 
     if (!this.initialized) { this.init() }
 
@@ -70,7 +70,7 @@ export class TransactionsService {
       if (this.isTransactionCompleted(tx)) {
         Logger.debug("processing " + tx.transactionHash)
         await this.processCallback(tx);
-        Logger.log("transaction completed: " + tx.transactionHash.substring(tx.transactionHash.length - 8, tx.transactionHash.length - 1))
+        Logger.log("transaction completed: " + tx.transactionHash.substring(tx.transactionHash.length - 8, tx.transactionHash.length))
         await this.transactionRepository.save(tx)
       }
     }
@@ -97,10 +97,10 @@ export class TransactionsService {
 
   async findAllPendingTransactions(): Promise<TransactionRecord[]> {
     const txs = await this.transactionRepository.find({ status: "submitted" })
-    Logger.log("Found Transactions: " + txs.length)
+    Logger.debug("Found Transactions: " + txs.length)
     const filtered
       = txs.filter(tx => tx.eventType !== null && tx.actionType !== null && tx.submitBlock !== null)
-    Logger.log("Found Nonnull Transactions: " + txs.length)
+    Logger.log("NonNull tx: " + filtered.length + " all: " + txs.length)
 
     return filtered;
   }
