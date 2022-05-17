@@ -12,12 +12,12 @@ npm run start:prod
 run in dev setting (local DB)
 npm run start:dev
 
-APIs
+## APIs
 
-ping (hello)
+# ping (hello)
 GET / 
 
-register transaction for deposit
+# register transaction for deposit
 
 POST /chain/register
 {
@@ -28,7 +28,9 @@ POST /chain/register
 
 }
 
-Withdraw request of NFT 
+response 20x
+
+# Withdraw request of NFT 
 POST /chain/withdrawal
 {
     "contract": "0xb9d822aE53D407F0aE77BCB8C6F8956c1ddEe671",
@@ -36,3 +38,4 @@ POST /chain/withdrawal
     "nftId":14
 
 }
+response 20x
