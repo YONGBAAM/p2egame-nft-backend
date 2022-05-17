@@ -13,3 +13,26 @@ run in dev setting (local DB)
 npm run start:dev
 
 APIs
+
+ping (hello)
+GET / 
+
+register transaction for deposit
+
+POST /chain/register
+{
+    "transactionHash": "0x224eb034abd39a08108047c3796a1dd7734e7777a406cd83426775eb88a00bcb",
+    "eventType": "Transfer",
+    "registeredFrom": "0x61050E06036bE54d82872865053D8Ae32d5f5e82",
+    "actionType": "deposit"
+
+}
+
+Withdraw request of NFT 
+POST /chain/withdrawal
+{
+    "contract": "0xb9d822aE53D407F0aE77BCB8C6F8956c1ddEe671",
+    "walletAddress": "0x61050E06036bE54d82872865053D8Ae32d5f5e82",
+    "nftId":14
+
+}
