@@ -1,4 +1,4 @@
-## P2E game Repository
+# P2E game Repository
 
 Frontend (Stage, Testnet) App is deployed at http://3.36.104.36:3001/
 Please install testnet klaytn with kaikas
@@ -12,12 +12,12 @@ npm run start:prod
 run in dev setting (local DB)
 npm run start:dev
 
-## APIs
+# APIs
 
-# ping (hello)
+## ping (hello)
 GET / 
 
-# register transaction for deposit
+## register transaction for deposit
 
 POST /chain/register
 {
@@ -30,7 +30,7 @@ POST /chain/register
 
 response 20x
 
-# Withdraw request of NFT 
+## Withdraw request of NFT 
 POST /chain/withdrawal
 {
     "contract": "0xb9d822aE53D407F0aE77BCB8C6F8956c1ddEe671",
