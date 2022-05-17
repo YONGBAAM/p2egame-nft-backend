@@ -40,3 +40,7 @@ POST /chain/withdrawal
 
 }
 response 20x
+
+
+## Consuming Event
+Automatically consume emit events of registered smart-contract every 10sec
