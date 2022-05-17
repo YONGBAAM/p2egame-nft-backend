@@ -32,9 +32,15 @@ export class Itemv2Controller {
     @Body() dto: userDto
   ): Promise<ItemsDto> {
     Logger.debug("get items " + JSON.stringify(dto))
-    const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
-    const ret = await this.itemsService.getItems(lu);
-    ret.items = ret.items.filter(i => i.count>0)
+    var ret = new ItemsDto();
+    try {
+      const lu = await this.usersService.getLocalUser(dto.walletAddress, dto.contract);
+      ret = await this.itemsService.getItems(lu);
+      ret.items = ret.items.filter(i => i.count>0)
+    } catch (error) {
+      throw new Error("error in getting items")
+    }
+
     return ret
   }
 
