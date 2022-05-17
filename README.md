@@ -44,3 +44,10 @@ response 20x
 
 ## Consuming Event
 Automatically consume emit events of registered smart-contract every 10sec
+
+
+# TODOs
+유닛 테스트 보완 + 엔드투엔드 유닛테스트 추가
+Eth지갑 case sensitiveness 고려
+범용 721 or 1155 이용 + 멀티 컨트랙 서포트
+Use Enum-like for Transaction type and action type.
