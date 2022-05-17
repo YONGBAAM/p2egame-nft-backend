@@ -31,7 +31,7 @@ POST /chain/register
 
 response 20x
 
-## Withdraw request of NFT 
+## Withdrawal request of Game Item
 POST /chain/withdrawal
 {
     "contract": "0xb9d822aE53D407F0aE77BCB8C6F8956c1ddEe671",
